@@ -28,7 +28,6 @@ public class BookClubProjectApplication {
             userService.saveRole(new Role(null, "USER"));
             userService.saveRole(new Role(null, "MANAGER"));
             userService.saveRole(new Role(null, "TECHNICIAN"));
-
             userService.addUser(new User("admin", "123456", "admin@admin.com", "admin", "admin", userService.getRoleByName("ADMIN")));
         };
 
