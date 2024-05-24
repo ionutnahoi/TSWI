@@ -1,6 +1,7 @@
 package com.project.tswi.jwt;
 
 
+import com.project.tswi.entity.User;
 import com.project.tswi.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -60,9 +61,10 @@ public class JWTUtility implements Serializable {
 
 
     //generate token for user
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id",userService.getUserByUsername(userDetails.getUsername()).getId());
+        claims.put("id",userDetails.getId());
+        claims.put("role", userDetails.getRole().name());
         return doGenerateToken(claims, userDetails.getUsername());
     }
 

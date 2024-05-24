@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,11 +39,13 @@ public class UserController {
     }
 
     @GetMapping("/users")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok().body(userService.getAll());
     }
 
     @GetMapping(value = "getById")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public Object getbyid(@RequestParam("idUser") Long id) {
         return userService.getbyid(id).isPresent() ? userService.getbyid(id).get() :
                 new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -67,7 +70,7 @@ public class UserController {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
 
-        final UserDetails userDetails
+        final User userDetails
                 = userService.loadUserByUsername(jwtRequest.getUsername());
 
         final String token =
@@ -85,16 +88,20 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
+    @PreAuthorize("hasAuthority('ADMIN')")
+
     public void delete(@PathVariable Long id) {
         userService.deleteById(id);
     }
 
     @PutMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public void update(@RequestParam User user) {
         userService.update(user);
     }
 
     @RequestMapping(value = "/NameOrEmail", method = RequestMethod.GET)
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public User getUserByNameOrEmail(@RequestParam(value = "name") Optional<String> name, @RequestParam(value = "email") Optional<String> email) {
         return userService.getUserByNameOrEmail(name, email);
     }
